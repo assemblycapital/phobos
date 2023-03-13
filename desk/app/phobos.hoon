@@ -40,6 +40,10 @@
     ?-  -.act
         %create-guest
       ?>  =(src.bowl our.bowl)
+      =.  guests
+        :-
+        create-new-guest:hc
+        guests
       `this
         %tag-guest
       ?>  =(src.bowl our.bowl)
@@ -114,4 +118,63 @@
       (send [200 ~ [%html ht]])
     ==
   ==
+++  create-random-botnet-moon
+  ^-  ship
+  :: get random 16bit value
+  :: ~botnet-[inner-id]-[our.bowl]
+  =/  inner-id=ship  (~(rad og eny.bowl) (pow 2 16))
+  :: format a tape patp
+  =/  inner-id-no-sig=tape  (slag 1 (trip (scot %p inner-id)))
+  =/  our-no-sig=tape  (slag 1 (trip (scot %p our.bowl)))
+  =/  random-botnet-moon=tape
+    ?:  =(%czar (clan:title our.bowl))
+      "~botnet-{inner-id-no-sig}-dozzod-doz{our-no-sig}"
+    ?:  =(%king (clan:title our.bowl))
+      "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
+    ?:  =(%duke (clan:title our.bowl))
+      "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
+    ~|  'only planets and higher can create phobos uests'
+    !!
+  :: slaw
+  ~&  >  random-botnet-moon
+  =/  us=(unit ship)  (slaw %p (crip random-botnet-moon))
+  ?~  us  !!
+  u.us
+++  create-new-guest
+  :: performance is bad after a few thousand guests
+  :: doesnt matter for prototype, but should solve later
+  ^-  guest:store
+  :: get set of existing guest ships
+  =/  existing-guests=(set ship)
+    %-  %~  gas  in  *(set ship)
+    %+  turn  guests
+    |=  =guest:store
+    id.guest
+  :: get random guest id
+  ::  (botnet prefix)
+  ::   until not in set
+  =/  new-guest-id=ship
+      create-random-botnet-moon
+  =.  new-guest-id
+    |-
+    ?:  (~(has in existing-guests) new-guest-id)
+      $(new-guest-id create-random-botnet-moon)
+    new-guest-id
+  ::
+  ::
+  :: initialize guest
+  =|  =guest:store
+  =.  id.guest
+    new-guest-id
+  =.  otp.guest
+    %-  crip
+    %+  slag  1
+    %-  trip
+    %+  scot  %p
+    (~(rad og eny.bowl) (pow 2 64))
+  =.  time-created.guest
+    now.bowl
+  =.  time-altered.guest
+    now.bowl
+  guest
 -- 
