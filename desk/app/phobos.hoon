@@ -118,11 +118,16 @@
       (send [200 ~ [%html ht]])
     ==
   ==
+++  get-guest
+  |=  id=@p
+  ^-  guest:store
+  *guest:store
 ++  create-random-botnet-moon
-  ^-  ship
+  |=  rng=_~(. og eny.bowl)
+  ^-  [ship _rng]
   :: get random 16bit value
   :: ~botnet-[inner-id]-[our.bowl]
-  =/  inner-id=ship  (~(rad og eny.bowl) (pow 2 16))
+  =^  inner-id=ship  rng  (rads:rng (pow 2 16))
   :: format a tape patp
   =/  inner-id-no-sig=tape  (slag 1 (trip (scot %p inner-id)))
   =/  our-no-sig=tape  (slag 1 (trip (scot %p our.bowl)))
@@ -133,13 +138,13 @@
       "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
     ?:  =(%duke (clan:title our.bowl))
       "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
-    ~|  'only planets and higher can create phobos uests'
+    ~|  'only planets and higher can create phobos guests'
     !!
   :: slaw
   ~&  >  random-botnet-moon
   =/  us=(unit ship)  (slaw %p (crip random-botnet-moon))
   ?~  us  !!
-  u.us
+  :-  u.us  rng
 ++  create-new-guest
   :: performance is bad after a few thousand guests
   :: doesnt matter for prototype, but should solve later
@@ -153,12 +158,14 @@
   :: get random guest id
   ::  (botnet prefix)
   ::   until not in set
-  =/  new-guest-id=ship
-      create-random-botnet-moon
+  =/  rng  ~(. og eny.bowl)
+  =^  new-guest-id=ship  rng
+      (create-random-botnet-moon rng)
   =.  new-guest-id
     |-
     ?:  (~(has in existing-guests) new-guest-id)
-      $(new-guest-id create-random-botnet-moon)
+      =^  res  rng  (create-random-botnet-moon rng)
+      $(new-guest-id res)
     new-guest-id
   ::
   ::
