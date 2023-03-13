@@ -11,7 +11,7 @@
   $%  state-0
   ==
 +$  state-0  $:
-  %0  guests=(list guest:store)
+  %0  =guests:store
   ==
 +$  card     card:agent:gall
 --
@@ -40,19 +40,31 @@
     ?-  -.act
         %create-guest
       ?>  =(src.bowl our.bowl)
+      ::TODO edge case, you can technically run out of id's at length=2^16
+      =/  =guest:store  create-new-guest:hc
       =.  guests
-        :-
-        create-new-guest:hc
-        guests
+        %+  ~(put by guests)
+        id.guest
+        guest
       `this
         %tag-guest
       ?>  =(src.bowl our.bowl)
+      =/  ugu=(unit guest:store)
+        (~(get by guests) id.act)
+      ?~  ugu
+        ~|  'phobos: bad guest id'  !!
+      =.  tags.u.ugu
+        :-  tag.act
+        tags.u.ugu
+      =.  time-altered.u.ugu
+        now.bowl
+      =.  guests
+        (~(put by guests) id.act u.ugu)
       `this
         %delete-guest
       ?>  =(src.bowl our.bowl)
-      `this
-        %claim-guest
-      ?>  =(src.bowl our.bowl)
+      =.  guests
+        (~(del by guests) id.act)
       `this
     ==
   ==
@@ -118,10 +130,6 @@
       (send [200 ~ [%html ht]])
     ==
   ==
-++  get-guest
-  |=  id=@p
-  ^-  guest:store
-  *guest:store
 ++  create-random-botnet-moon
   |=  rng=_~(. og eny.bowl)
   ^-  [ship _rng]
@@ -141,7 +149,6 @@
     ~|  'only planets and higher can create phobos guests'
     !!
   :: slaw
-  ~&  >  random-botnet-moon
   =/  us=(unit ship)  (slaw %p (crip random-botnet-moon))
   ?~  us  !!
   :-  u.us  rng
@@ -152,7 +159,7 @@
   :: get set of existing guest ships
   =/  existing-guests=(set ship)
     %-  %~  gas  in  *(set ship)
-    %+  turn  guests
+    %+  turn  ~(val by guests)
     |=  =guest:store
     id.guest
   :: get random guest id
