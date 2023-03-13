@@ -185,7 +185,9 @@
     %+  slag  1
     %-  trip
     %+  scot  %p
-    (~(rad og eny.bowl) (pow 2 64))
+    =^  otp-raw=@q  rng
+      (rads:rng (pow 2 64))
+    otp-raw
   =.  time-created.guest
     now.bowl
   =.  time-altered.guest
