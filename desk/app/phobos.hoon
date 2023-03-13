@@ -126,7 +126,7 @@
       =/  ht
         %-  crip
         %-  en-xml:html
-        (page:webui:phobos bowl)
+        (page:webui:phobos bowl guests)
       (send [200 ~ [%html ht]])
     ==
   ==
@@ -180,13 +180,13 @@
   =|  =guest:store
   =.  id.guest
     new-guest-id
+  =^  otp-raw=@q  rng
+    (rads:rng (pow 2 64))
   =.  otp.guest
     %-  crip
     %+  slag  1
     %-  trip
     %+  scot  %p
-    =^  otp-raw=@q  rng
-      (rads:rng (pow 2 64))
     otp-raw
   =.  time-created.guest
     now.bowl

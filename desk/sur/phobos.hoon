@@ -22,6 +22,7 @@
   $%
     [%create-guest ~]
     [%tag-guest id=@p tag=@t]
+    :: [%untag-guest id=@p tag=@t]
     [%delete-guest id=@p]
   ==
 --

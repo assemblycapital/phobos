@@ -38,8 +38,51 @@
   --
 ++  webui
   |%
+  ++  flatten-tags
+    |=  [tags=(list @t)]
+    ^-  cord
+    =/  lags=(list tape)
+      %+  turn  tags
+      |=  t=@t
+      (trip t)
+    %-  crip
+    %-  zing
+    %+  join  ", "
+    lags
+  ++  render-guests
+    |=  [=guests]
+    ^-  manx
+    ;table
+      =style  "margin:auto;padding-bottom:2vh;"
+      ;thead
+        ;tr
+          ;td: id
+          ;td: handle
+          ;td: otp
+          ;td: tags
+          ;td: session-token
+          ;td: time-created
+          ;td: time-altered
+          ;td: time-claimed
+        ==
+      ==
+      ;tbody
+      ;*  %+  turn  ~(val by guests)
+        |=  =guest
+        ;tr
+          ;td: {<id.guest>}
+          ;td: {<handle.guest>}
+          ;td: {<otp.guest>}
+          ;td: {<(flatten-tags tags.guest)>}
+          ;td: {<session-token.guest>}
+          ;td: {<time-created.guest>}
+          ;td: {<time-altered.guest>}
+          ;td: {<time-claimed.guest>}
+        ==
+      ==
+    ==
   ++  page
-    |=  [=bowl:gall]
+    |=  [=bowl:gall =guests]
     ^-  manx
     ;html
       ;head
@@ -62,7 +105,7 @@
           :: content
           =style  "overflow:scroll;padding-bottom:128px;"
             ;h3: guests
-            ;p: TODO
+            ;+  (render-guests guests)
           ==
 
           ;footer
