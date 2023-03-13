@@ -1,0 +1,11 @@
+:~  title+'phobos'
+    info+'invite your friends to log in to your urbit'
+    color+0xff.ffff
+    image+'https://em-content.zobj.net/thumbs/240/apple/325/dog-face_1f436.png'
+    :: glob-http+['https://bwyl.nyc3.digitaloceanspaces.com/basket%2Fbasket-0.1.1-0v5.knsp5.ndgsu.as66h.epjve.c9qag.glob' 0v5.knsp5.ndgsu.as66h.epjve.c9qag]
+    base+'phobos'
+    site+/apps/phobos
+    version+[0 1 0]
+    website+'https://github.com/assemblycapital/phobos'
+    license+'MIT'
+==
