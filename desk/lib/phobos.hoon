@@ -53,8 +53,10 @@
     |=  [=guests]
     ^-  manx
     ;table
-      =style  "margin:auto;padding-bottom:2vh;"
+      =style  "margin:auto;padding-bottom:2vh;text-align:center;font-family:monospace;"
+      ::
       ;thead
+        =style  "font-weight: bold;"
         ;tr
           ;td: id
           ;td: handle
@@ -70,10 +72,16 @@
       ;*  %+  turn  ~(val by guests)
         |=  =guest
         ;tr
-          ;td: {<id.guest>}
+          ;td: {<(crip (scag 6 (slag 8 (trip (scot %p id.guest)))))>}
           ;td: {<handle.guest>}
           ;td: {<otp.guest>}
-          ;td: {<(flatten-tags tags.guest)>}
+          ;td.tags
+            ;form(method "post")
+              ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
+              ;input(type "text", name "tag", placeholder "new tag");
+            ==
+            ;span: {<(flatten-tags tags.guest)>}
+          ==
           ;td: {<session-token.guest>}
           ;td: {<time-created.guest>}
           ;td: {<time-altered.guest>}
@@ -96,15 +104,15 @@
           :: height-wrapper
           =style  "height:100vh;max-height:100vh"
           ;h1: phobos
-          ;p
-            ;a(target "_blank", href "https://github.com/assemblycapital/vita/#readme"): README
-          ==
-          ;hr;
+        ::  ;p
+        ::    ;a(target "_blank", href "https://github.com/assemblycapital/vita/#readme"): README
+        ::  ==
+        ::  ;hr;
         
           ;div
           :: content
           =style  "overflow:scroll;padding-bottom:128px;"
-            ;h3: guests
+            :: ;h3: guests
             ;+  (render-guests guests)
           ==
 

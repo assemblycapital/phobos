@@ -47,12 +47,20 @@
         id.guest
         guest
       `this
+        %delete-guest
+      ?>  =(src.bowl our.bowl)
+      =.  guests
+        (~(del by guests) id.act)
+      `this
         %tag-guest
       ?>  =(src.bowl our.bowl)
       =/  ugu=(unit guest:store)
         (~(get by guests) id.act)
       ?~  ugu
         ~|  'phobos: bad guest id'  !!
+      ?:  (~(has in (~(gas in *(set term)) tags.u.ugu)) tag.act)
+        ~&  'phobos: already tagged'
+        `this
       =.  tags.u.ugu
         :-  tag.act
         tags.u.ugu
@@ -61,10 +69,19 @@
       =.  guests
         (~(put by guests) id.act u.ugu)
       `this
-        %delete-guest
+        %untag-guest
       ?>  =(src.bowl our.bowl)
+      =/  ugu=(unit guest:store)
+        (~(get by guests) id.act)
+      ?~  ugu
+        ~|  'phobos: bad guest id'  !!
+      =.  tags.u.ugu
+          %~  tap  in
+          (~(del in (~(gas in *(set term)) tags.u.ugu)) tag.act)
+      =.  time-altered.u.ugu
+        now.bowl
       =.  guests
-        (~(del by guests) id.act)
+        (~(put by guests) id.act u.ugu)
       `this
     ==
   ==
@@ -102,6 +119,8 @@
 :: :: helper core
 :: ::
 |_  bowl=bowl:gall
+++  fof
+  [404 ~ [%plain "404 - Not Found"]]
 ++  handle-http
   |=  [eyre-id=@ta =inbound-request:eyre]
   ^-  (quip card _state)
@@ -116,6 +135,24 @@
   ?+    method.request.inbound-request 
     [(send [405 ~ [%stock ~]]) state]
     ::
+      %'POST'
+    ?~  body.request.inbound-request
+      [(send fof) state]
+    =/  are=(unit (map @t @t))
+        %+  bind
+          (rush q.u.body.request.inbound-request yquy:de-purl:html)
+        ~(gas by *(map @t @t))
+    ?~  are
+      [(send fof) state]
+    =/  arm  u.are 
+    ::
+    ?+  site  [(send fof) state]
+      [%apps %phobos ~]
+    ~&  ['phobos got body stuff' arm]
+    :_  state
+      (send [200 ~ [%plain "200 - Success"]])
+    ==
+    ::
       %'GET'
     ?+    site  
       :_  state 
@@ -128,6 +165,40 @@
         %-  en-xml:html
         (page:webui:phobos bowl guests)
       (send [200 ~ [%html ht]])
+        [%apps %phobos %claim ~]
+      ~&  request.inbound-request
+      ~&  args
+      =/  args=(map @t @t)
+        (~(gas by *(map @t @t)) args)
+      
+      ?.  (~(has by args) 'otp')
+        ~&  'phobos: no otp in claim'
+        :_  state
+        (send [403 ~ [%plain "403 - Forbidden"]])
+      =/  otp=term
+        (~(got by args) 'otp')
+      ~&  "phobos: got otp {<otp>}"
+      =/  matches=(list guest:store)
+        %+  skim  ~(val by guests)
+        |=  =guest:store
+        ^-  ?
+        ?~  otp.guest  |
+        ?&  =(otp u.otp.guest)
+            =(~ time-claimed.guest)
+        ==
+      ::
+      ?~  matches
+        ~&  'phobos: bad otp'
+        :_  state
+        (send [403 ~ [%plain "403 - Forbidden"]])
+      ~&  ['phobos got matches' matches]
+      =/  gus=guest:store  i.matches
+      =.  time-claimed.gus  [~ now.bowl]
+      =.  otp.gus  ~
+      =.  guests
+        (~(put by guests) id.gus gus)
+      :_  state
+      (send [200 ~ [%html 'test']])
     ==
   ==
 ++  create-random-botnet-moon
@@ -183,6 +254,7 @@
   =^  otp-raw=@q  rng
     (rads:rng (pow 2 64))
   =.  otp.guest
+    :-  ~
     %-  crip
     %+  slag  1
     %-  trip
