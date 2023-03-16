@@ -7,7 +7,7 @@
     id=@p
     handle=(unit @t)
     otp=(unit @t)
-    tags=(list @t)
+    tags=(set @t)
     session-token=(unit @t)
     time-created=@da
     time-altered=@da
@@ -20,7 +20,7 @@
 +$  guests  (map @p guest)
 +$  action
   $%
-    [%create-guest ~]
+    [%create-guest tags=(unit (set @t))]
     [%tag-guest id=@p tag=@t]
     [%untag-guest id=@p tag=@t]
     [%delete-guest id=@p]

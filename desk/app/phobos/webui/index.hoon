@@ -1,5 +1,8 @@
 ::  phobos index
 ::
+:: this is my first time using rudder,
+:: much of the code uses ~paldev/pals as a reference
+::
 /-  store=phobos
 /+  rudder
 ::
@@ -11,15 +14,24 @@
   ^-  $@(brief:rudder action:store)
   =/  args=(map @t @t)
     ?~(body ~ (frisk:rudder q.u.body))
-  ?~  what=(~(get by args) 'what')
+  ?~  head=(~(get by args) 'head')
     ~
-  ?~  who=(slaw %p (~(gut by args) 'who' ''))
-    'invalid ship name'
-  |^  ?+  u.what  'say what now'
+  :: ?~  who=(slaw %p (~(gut by args) 'who' ''))
+  ::   'invalid ship name'
+  :: ~&  >  ['got args' args]
+  |^  ?+  u.head  'invalid action head'
           %create-guest
-        [%create-guest ~]
+        :: =/  raw-tags=(unit cord)
+        ::  (~(get by args) 'tags')
+        [%create-guest get-tags]
       ==
-    ++  nil  ~
+    ++  get-tags
+      :: from ~paldev/pals
+      ^-  (unit (set @ta))
+      %+  rush  (~(gut by args) 'tags' '')
+      %+  cook
+        |=(s=(list @ta) (~(del in (~(gas in *(set @ta)) s)) ''))
+      (more (ifix [. .]:(star ace) com) urs:ab)
   --
 ++  final  (alert:rudder url.request build)
 ::
@@ -55,12 +67,15 @@
           :: height-wrapper
           =style  "height:100vh;max-height:100vh"
           ;h1: phobos
-          ;p: testing rudder
         ::  ;p
         ::    ;a(target "_blank", href "https://github.com/assemblycapital/vita/#readme"): README
         ::  ==
         ::  ;hr;
-          ;button: create new invite
+            ;form(method "post")
+              ;input(type "hidden", name "head", value "create-guest");
+              ;input(type "text", name "tags", placeholder "some, tags");
+              ;input(type "submit", value "new");
+            ==
         
           ;div
           :: content
@@ -89,10 +104,10 @@
       ==
     ==
   ++  flatten-tags
-    |=  [tags=(list @t)]
+    |=  [tags=(set @t)]
     ^-  cord
     =/  lags=(list tape)
-      %+  turn  tags
+      %+  turn  ~(tap in tags)
       |=  t=@t
       (trip t)
     %-  crip

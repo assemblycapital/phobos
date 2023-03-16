@@ -36,37 +36,35 @@
       %handle-http-request
     =;  out=(quip card:agent:gall _guests)
       [-.out this(guests +.out)]
-    %.
-      :+  bowl
-        
-        !<(order:rudder vase)
-      guests
-  %:  (steer:rudder _guests action:store)
-    pages
-    %:  point:rudder
-      /apps/phobos
-      &
-      ~(key by pages)
+    %.  :+  bowl
+          !<(order:rudder vase)
+          guests
+    %:  (steer:rudder _guests action:store)
+      pages
+      %:  point:rudder
+        /apps/phobos
+        &
+        ~(key by pages)
+      ==
+      (fours:rudder guests)
+      |=  act=action:store
+      ^-  $@  brief:rudder
+          [brief:rudder (list card:agent:gall) _guests]
+      =^  caz  this
+        (on-poke %phobos-action !>(act))
+      ['Processed succesfully.' caz +.state]
     ==
-    (fours:rudder guests)
-    |=  act=action:store
-    ^-  $@  brief:rudder
-        [brief:rudder (list card:agent:gall) _guests]
-    ?+  -.act  ``guests
-      %tag-guest  ``guests
-    ==
-  ==
-    :: =^  cards  state
-    ::   (handle-http:hc !<([@ta =inbound-request:eyre] vase))
-    :: [cards this]
-
       %phobos-action
     =/  act  !<(action:store vase)
     ?-  -.act
         %create-guest
       ?>  =(src.bowl our.bowl)
-      ::TODO edge case, you can technically run out of id's at length=2^16
+      :: edge case, you can technically run out of id's at length=2^16
+      :: ~&  [%create-guest act]
       =/  =guest:store  create-new-guest:hc
+      =.  tags.guest
+        ?~  tags.act  tags.guest
+        (~(uni in tags.guest) u.tags.act)
       =.  guests
         %+  ~(put by guests)
         id.guest
@@ -83,12 +81,11 @@
         (~(get by guests) id.act)
       ?~  ugu
         ~|  'phobos: bad guest id'  !!
-      ?:  (~(has in (~(gas in *(set term)) tags.u.ugu)) tag.act)
+      ?:  (~(has in tags.u.ugu) tag.act)
         ~&  'phobos: already tagged'
         `this
       =.  tags.u.ugu
-        :-  tag.act
-        tags.u.ugu
+        (~(put in tags.u.ugu) tag.act)
       =.  time-altered.u.ugu
         now.bowl
       =.  guests
@@ -101,8 +98,7 @@
       ?~  ugu
         ~|  'phobos: bad guest id'  !!
       =.  tags.u.ugu
-          %~  tap  in
-          (~(del in (~(gas in *(set term)) tags.u.ugu)) tag.act)
+          (~(del in tags.u.ugu) tag.act)
       =.  time-altered.u.ugu
         now.bowl
       =.  guests
@@ -144,6 +140,9 @@
 :: :: helper core
 :: ::
 |_  bowl=bowl:gall
+:: ++  handle-poke
+:: TODO
+:::
 ++  fof
   [404 ~ [%plain "404 - Not Found"]]
 ++  handle-http
@@ -185,11 +184,11 @@
       ::
         [%apps %phobos ~]
       :_  state
-      =/  ht
-        %-  crip
-        %-  en-xml:html
-        (page:webui:phobos bowl guests)
-      (send [200 ~ [%html ht]])
+      :: =/  ht
+      ::   %-  crip
+      ::   %-  en-xml:html
+      ::   (page:webui:phobos bowl guests)
+      (send [200 ~ [%html 'todo replaceme']])
         [%apps %phobos %claim ~]
       ~&  request.inbound-request
       ~&  args
