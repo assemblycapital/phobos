@@ -3,7 +3,9 @@
 ::
 /-  store=phobos
 /+  phobos, server, schooner
+/+  rudder
 /+  default-agent, verb, dbug, agentio
+/~  pages  (page:rudder guests:store action:store)  /app/phobos/webui
 =,  format
 :: ::
 |%
@@ -32,9 +34,32 @@
   ^-  (quip card _this)
   ?+  mark  (on-poke:def mark vase)
       %handle-http-request
-    =^  cards  state
-      (handle-http:hc !<([@ta =inbound-request:eyre] vase))
-    [cards this]
+    =;  out=(quip card:agent:gall _guests)
+      [-.out this(guests +.out)]
+    %.
+      :+  bowl
+        
+        !<(order:rudder vase)
+      guests
+  %:  (steer:rudder _guests action:store)
+    pages
+    %:  point:rudder
+      /apps/phobos
+      &
+      ~(key by pages)
+    ==
+    (fours:rudder guests)
+    |=  act=action:store
+    ^-  $@  brief:rudder
+        [brief:rudder (list card:agent:gall) _guests]
+    ?+  -.act  ``guests
+      %tag-guest  ``guests
+    ==
+  ==
+    :: =^  cards  state
+    ::   (handle-http:hc !<([@ta =inbound-request:eyre] vase))
+    :: [cards this]
+
       %phobos-action
     =/  act  !<(action:store vase)
     ?-  -.act

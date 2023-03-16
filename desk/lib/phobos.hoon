@@ -108,6 +108,7 @@
         ::    ;a(target "_blank", href "https://github.com/assemblycapital/vita/#readme"): README
         ::  ==
         ::  ;hr;
+          ;button: create new invite
         
           ;div
           :: content
