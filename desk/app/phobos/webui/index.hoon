@@ -24,11 +24,11 @@
         ::  (~(get by args) 'tags')
         [%create-guest get-tags]
           %tag-guest
-        =/  t  get-tags
-        ?~  t  'no tags'
+        =/  tags  get-tags
+        ?~  tags  'no tags'
         ?~  who=(slaw %p (~(gut by args) 'who' ''))
           'invalid ship name'
-        [%tag-guest u.who u.t]
+        [%tag-guest u.who u.tags]
           %untag-guest
         =+  tag=(~(gut by args) 'tag' '')
         ?~  who=(slaw %p (~(gut by args) 'who' ''))
@@ -103,8 +103,11 @@
       ;*  %+  turn  ~(tap in tags)
       |=  tag=@t
       ;span
-        =style  "margin:0.5rem; padding:1rem; border: 1px; border-color: black;"
-        ;span:"{(trip tag)}"
+        =style  "display:inline-block;margin-left:0.4rem;border: 2px solid gray; border-radius: 2px;"
+        ;span
+          =style  "margin:0rem 0.2rem;"
+          ; {(trip tag)}
+        ==
         ;form(method "post")
           ;input(type "hidden", name "head", value "untag-guest");
           ;input(type "hidden", name "tag", value "{(trip tag)}");
