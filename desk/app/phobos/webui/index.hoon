@@ -12,6 +12,8 @@
   ++  argue
   |=  [headers=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder action:store)
+  ?.  authenticated
+    'phobos index argue: unauthorized'
   =/  args=(map @t @t)
     ?~(body ~ (frisk:rudder q.u.body))
   ?~  head=(~(get by args) 'head')
@@ -52,6 +54,8 @@
           msg=(unit [o=? =@t])
       ==
   ^-  reply:rudder
+  ?.  authenticated
+    [%auth url.request]
   |^  [%page page]
   ::
   ++  style

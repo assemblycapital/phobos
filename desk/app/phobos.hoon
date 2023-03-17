@@ -43,7 +43,7 @@
       pages
       %:  point:rudder
         /apps/phobos
-        & :: TODO this forces auth for every page 🤔
+        | :: TODO this forces auth for every page 🤔
         ~(key by pages)
       ==
       (fours:rudder guests)
