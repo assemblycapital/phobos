@@ -43,7 +43,7 @@
       pages
       %:  point:rudder
         /apps/phobos
-        &
+        & :: TODO this forces auth for every page 🤔
         ~(key by pages)
       ==
       (fours:rudder guests)
@@ -52,7 +52,7 @@
           [brief:rudder (list card:agent:gall) _guests]
       =^  caz  this
         (on-poke %phobos-action !>(act))
-      ['Processed succesfully.' caz +.state]
+      [~ caz +.state]
     ==
       %phobos-action
     =/  act  !<(action:store vase)
@@ -81,11 +81,11 @@
         (~(get by guests) id.act)
       ?~  ugu
         ~|  'phobos: bad guest id'  !!
-      ?:  (~(has in tags.u.ugu) tag.act)
-        ~&  'phobos: already tagged'
-        `this
+      :: ?:  (~(has in tags.u.ugu) tags.act)
+      ::   ~&  'phobos: already tagged'
+      ::   `this
       =.  tags.u.ugu
-        (~(put in tags.u.ugu) tag.act)
+        (~(uni in tags.u.ugu) tags.act)
       =.  time-altered.u.ugu
         now.bowl
       =.  guests

@@ -16,14 +16,24 @@
     ?~(body ~ (frisk:rudder q.u.body))
   ?~  head=(~(get by args) 'head')
     ~
-  :: ?~  who=(slaw %p (~(gut by args) 'who' ''))
-  ::   'invalid ship name'
+  
   :: ~&  >  ['got args' args]
   |^  ?+  u.head  'invalid action head'
           %create-guest
         :: =/  raw-tags=(unit cord)
         ::  (~(get by args) 'tags')
         [%create-guest get-tags]
+          %tag-guest
+        =/  t  get-tags
+        ?~  t  'no tags'
+        ?~  who=(slaw %p (~(gut by args) 'who' ''))
+          'invalid ship name'
+        [%tag-guest u.who u.t]
+          %untag-guest
+        =+  tag=(~(gut by args) 'tag' '')
+        ?~  who=(slaw %p (~(gut by args) 'who' ''))
+          'invalid ship name'
+        [%untag-guest u.who tag]
       ==
     ++  get-tags
       :: from ~paldev/pals
@@ -40,19 +50,22 @@
           msg=(unit [o=? =@t])
       ==
   ^-  reply:rudder
-  ::
-  :: =/  rel=role
-  ::   =/  a  (~(gas by *(map @t @t)) arg)
-  ::   =/  r  (~(gut by a) 'rel' %all)
-  ::   ?:(?=(role r) r %all)
-  :: =/  tag=(set @ta)
-  ::   %-  sy
-  ::   %+  murn  arg
-  ::   |=  [k=@t v=@t]
-  ::   ?:(=('tag' k) (some v) ~)
-  ::
   |^  [%page page]
   ::
+  ++  style
+    '''
+    p { max-width: 50em; }
+
+    form {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      padding: 0.2em 0.5em;
+    }
+    '''
   ++  page
     ^-  manx
     ;html
@@ -61,21 +74,18 @@
         ;style:"body \{ text-align: center; margin:0;}"
         ;meta(charset "utf-8");
         ;meta(name "viewport", content "width=device-width, initial-scale=1");
+        ;style:"{(trip style)}"
       ==
       ;body
         ;div
           :: height-wrapper
           =style  "height:100vh;max-height:100vh"
           ;h1: phobos
-        ::  ;p
-        ::    ;a(target "_blank", href "https://github.com/assemblycapital/vita/#readme"): README
-        ::  ==
-        ::  ;hr;
-            ;form(method "post")
-              ;input(type "hidden", name "head", value "create-guest");
-              ;input(type "text", name "tags", placeholder "some, tags");
-              ;input(type "submit", value "new");
-            ==
+          ;form(method "post")
+            ;input(type "hidden", name "head", value "create-guest");
+            ;input(type "text", name "tags", placeholder "some, tags", autocomplete "off");
+            ;input(type "submit", value "new");
+          ==
         
           ;div
           :: content
@@ -83,37 +93,26 @@
             :: ;h3: guests
             ;+  render-guests
           ==
-
-          ;footer
-            :: footer
-            =style  "bottom:0;position:fixed;width:100%;background-color:white;"
-            ;p
-              =style  "margin:4px 0px;"
-              ; {<our.bowl>}
-            ==
-            ;p
-              =style  "margin:4px 0px;"
-              ; {<now.bowl>}
-            ==
-            :: assembly capital logo
-            ;svg(width "32", height "32", viewbox "0 0 388 194", fill "none", xmlns "http://www.w3.org/2000/svg")
-              ;path(d "M194 0H97V97H0V194H97V97H194H291V194H388V97H291V0H194Z", fill "black");
-            ==
-          ==
         ==
       ==
     ==
-  ++  flatten-tags
-    |=  [tags=(set @t)]
-    ^-  cord
-    =/  lags=(list tape)
-      %+  turn  ~(tap in tags)
-      |=  t=@t
-      (trip t)
-    %-  crip
-    %-  zing
-    %+  join  ", "
-    lags
+  ++  render-tags
+    |=  [who=@p tags=(set @t)]
+    ^-  manx
+    ;span
+      ;*  %+  turn  ~(tap in tags)
+      |=  tag=@t
+      ;span
+        =style  "margin:0.5rem; padding:1rem; border: 1px; border-color: black;"
+        ;span:"{(trip tag)}"
+        ;form(method "post")
+          ;input(type "hidden", name "head", value "untag-guest");
+          ;input(type "hidden", name "tag", value "{(trip tag)}");
+          ;input(type "hidden", name "who", value "{(scow %p who)}");
+          ;input(type "submit", value "x");
+        == 
+      ==
+    ==
   ++  render-guests
     ^-  manx
     ;table
@@ -123,9 +122,9 @@
         =style  "font-weight: bold;"
         ;tr
           ;td: id
+          ;td: tags
           ;td: handle
           ;td: otp
-          ;td: tags
           ;td: session-token
           ;td: time-created
           ;td: time-altered
@@ -133,19 +132,26 @@
         ==
       ==
       ;tbody
-      ;*  %+  turn  ~(val by guests)
+      ;*  %+  turn
+              %+  sort  ~(val by guests)
+              |=  [a=guest:store b=guest:store]
+              ^-  ?
+              (gth time-altered.a time-altered.b)
         |=  =guest:store
         ;tr
-          ;td: {<(crip (scag 6 (slag 8 (trip (scot %p id.guest)))))>}
+          ;td: {"_{(scag 6 (slag 8 (trip (scot %p id.guest))))}"}
+          ;td.tags
+            =style  "text-align:left;"
+            ;form(method "post")
+              ;input(type "hidden", name "head", value "tag-guest");
+              ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
+              ;input(type "text", name "tags", placeholder "some, tags", autocomplete "off");
+              ;input(type "submit", value "+");
+            ==
+            ;+  (render-tags id.guest tags.guest)
+          ==
           ;td: {<handle.guest>}
           ;td: {<otp.guest>}
-          ;td.tags
-            ;form(method "post")
-              ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
-              ;input(type "text", name "tag", placeholder "new tag");
-            ==
-            ;span: {<(flatten-tags tags.guest)>}
-          ==
           ;td: {<session-token.guest>}
           ;td: {<time-created.guest>}
           ;td: {<time-altered.guest>}

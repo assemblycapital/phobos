@@ -21,7 +21,7 @@
 +$  action
   $%
     [%create-guest tags=(unit (set @t))]
-    [%tag-guest id=@p tag=@t]
+    [%tag-guest id=@p tags=(set @t)]
     [%untag-guest id=@p tag=@t]
     [%delete-guest id=@p]
   ==
