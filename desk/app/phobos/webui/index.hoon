@@ -17,12 +17,14 @@
   ?~  head=(~(get by args) 'head')
     ~
   
-  :: ~&  >  ['got args' args]
+  ~&  >  ['got args' args]
   |^  ?+  u.head  'invalid action head'
           %create-guest
-        :: =/  raw-tags=(unit cord)
-        ::  (~(get by args) 'tags')
         [%create-guest get-tags]
+          %delete-guest
+        ?~  who=(slaw %p (~(gut by args) 'who' ''))
+          'invalid ship name'
+        [%delete-guest u.who]
           %tag-guest
         =/  tags  get-tags
         ?~  tags  'no tags'
@@ -103,7 +105,7 @@
       ;*  %+  turn  ~(tap in tags)
       |=  tag=@t
       ;span
-        =style  "display:inline-block;margin-left:0.4rem;border: 2px solid gray; border-radius: 2px;"
+        =style  "display:inline-block;margin-left:0.4rem;border: 1px solid gray; border-radius: 2px;"
         ;span
           =style  "margin:0rem 0.2rem;"
           ; {(trip tag)}
@@ -142,10 +144,19 @@
               (gth time-altered.a time-altered.b)
         |=  =guest:store
         ;tr
-          ;td: {"_{(scag 6 (slag 8 (trip (scot %p id.guest))))}"}
+          ;td
+            =style  "white-space:nowrap;"
+            ;form(method "post")
+              ;input(type "hidden", name "head", value "delete-guest");
+              ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
+              ;input(type "submit", value "-");
+            ==
+            ;span: {"_{(scag 6 (slag 8 (trip (scot %p id.guest))))}"}
+          ==
           ;td.tags
             =style  "text-align:left;"
             ;form(method "post")
+              =style  "white-space:nowrap;"
               ;input(type "hidden", name "head", value "tag-guest");
               ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
               ;input(type "text", name "tags", placeholder "some, tags", autocomplete "off");
