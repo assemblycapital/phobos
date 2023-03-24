@@ -43,20 +43,56 @@
       pages
       %:  point:rudder
         /apps/phobos
-        | :: TODO this forces auth for every page 🤔
+        | :: not auth by default, auth has to be enforced elseware for some pages
+          ::  this is because we need the guest claim endpoint to be publicly accessible,
+          ::  plus some interactable test site for use with the new cookie
         ~(key by pages)
       ==
       (fours:rudder guests)
       |=  act=action:store
       ^-  $@  brief:rudder
           [brief:rudder (list card:agent:gall) _guests]
-      =^  caz  this
-        (on-poke %phobos-action !>(act))
-      [~ caz +.state]
+      ?+  -.act
+        =^  caz  this
+          (on-poke %phobos-action !>(act))
+        [~ caz +.state]
+          %claim-guest
+        :: special case for claim-guest, in order to get return msg
+        :: TODO this should be improved,
+        :: probably make explicit in /sur/phobos
+        :: [~ ~ +.state]
+        ?>  =(src.bowl our.bowl)
+        ::
+        =/  matches=(list guest:store)
+          %+  skim  ~(val by guests)
+          |=  =guest:store
+          ^-  ?
+          ?~  otp.guest  |
+          ?&  =(otp.act u.otp.guest)
+              =(~ time-claimed.guest)
+          ==
+        ::
+        ?~  matches
+          :: ['authentication failed' ~ guests]
+          'authenticationFailed'
+        :: ~&  ['phobos got matche' matches]
+        :: just take the first match
+        =/  gus=guest:store  i.matches
+        =.  time-claimed.gus  [~ now.bowl]
+        =.  otp.gus  ~
+        =/  rng  ~(. og eny.bowl)
+        =^  sess-raw=@q  rng
+          (rads:rng (pow 2 64))
+        =.  session-token.gus
+          [~ (scot %q sess-raw)]
+        =.  guests
+          (~(put by guests) id.gus gus)
+        ['authenticated' ~ guests]
+      ==
     ==
       %phobos-action
     =/  act  !<(action:store vase)
-    ?-  -.act
+    ?+  -.act  `this
         %create-guest
       ?>  =(src.bowl our.bowl)
       :: edge case, you can technically run out of id's at length=2^16

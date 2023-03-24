@@ -24,5 +24,6 @@
     [%tag-guest id=@p tags=(set @t)]
     [%untag-guest id=@p tag=@t]
     [%delete-guest id=@p]
+    [%claim-guest otp=@t]
   ==
 --
