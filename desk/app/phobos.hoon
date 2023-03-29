@@ -81,13 +81,18 @@
         =.  time-claimed.gus  [~ now.bowl]
         =.  otp.gus  ~
         =/  rng  ~(. og eny.bowl)
-        =^  sess-raw=@q  rng
-          (rads:rng (pow 2 64))
+        :: =^  sess-raw=@q  rng
+        ::   (rads:rng (pow 2 64))
+        =/  session-token-val=@ux
+            (~(rad og eny.bowl) (pow 2 128))
+        =/  session-token=@t
+            %-  crip
+            "phobos-{<id.gus>}={<session-token-val>}"
         =.  session-token.gus
-          [~ (scot %q sess-raw)]
+            [~ session-token]
         =.  guests
           (~(put by guests) id.gus gus)
-        ['authenticated' ~ guests]
+        [session-token ~ guests]
       ==
     ==
       %phobos-action
@@ -184,6 +189,9 @@
 ++  handle-http
   |=  [eyre-id=@ta =inbound-request:eyre]
   ^-  (quip card _state)
+  :: TODO this is no longer used.
+  :: it may be worth binding this to another endpoint,
+  :: so that non-browser apps can authenticate
   =/  ,request-line:server
     (parse-request-line:server url.request.inbound-request)
   =+  send=(cury response:schooner eyre-id)
@@ -208,7 +216,7 @@
     ::
     ?+  site  [(send fof) state]
       [%apps %phobos ~]
-    ~&  ['phobos got body stuff' arm]
+    :: ~&  ['phobos got body stuff' arm]
     :_  state
       (send [200 ~ [%plain "200 - Success"]])
     ==
@@ -226,18 +234,18 @@
       ::   (page:webui:phobos bowl guests)
       (send [200 ~ [%html 'todo replaceme']])
         [%apps %phobos %claim ~]
-      ~&  request.inbound-request
-      ~&  args
+      :: ~&  request.inbound-request
+      :: ~&  args
       =/  args=(map @t @t)
         (~(gas by *(map @t @t)) args)
       
       ?.  (~(has by args) 'otp')
-        ~&  'phobos: no otp in claim'
+        :: ~&  'phobos: no otp in claim'
         :_  state
         (send [403 ~ [%plain "403 - Forbidden"]])
       =/  otp=term
         (~(got by args) 'otp')
-      ~&  "phobos: got otp {<otp>}"
+      :: ~&  "phobos: got otp {<otp>}"
       =/  matches=(list guest:store)
         %+  skim  ~(val by guests)
         |=  =guest:store
@@ -248,10 +256,10 @@
         ==
       ::
       ?~  matches
-        ~&  'phobos: bad otp'
+        :: ~&  'phobos: bad otp'
         :_  state
         (send [403 ~ [%plain "403 - Forbidden"]])
-      ~&  ['phobos got matches' matches]
+      :: ~&  ['phobos got matches' matches]
       =/  gus=guest:store  i.matches
       =.  time-claimed.gus  [~ now.bowl]
       =.  otp.gus  ~

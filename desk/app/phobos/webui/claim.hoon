@@ -16,7 +16,7 @@
     ~
   ?~  otp=(~(get by args) 'otp')
     'missing otp arg'
-  ~&  >  ['argue got args' args]
+  :: ~&  >  ['argue got args' args]
   ?+  u.head  'invalid action head'
       %claim-guest
     [%claim-guest u.otp]
@@ -31,11 +31,13 @@
   :: success
   :: setcookie and 303 to ./claim-success
   :: I think the brief needs to be the session token for this to work in rudder... lol
+  ?~  brief
+    [%code 404 ~]
   =|  =simple-payload:http
   =.  response-header.simple-payload
     :-  303
-    ~[['Location' 'claim-success'] ['set-cookie' 'test=banana']]
-    :: ~[['Location' 'claim-success'] ['testing123' 'bananabanananananananana']]
+    ~[['Location' 'claim-success'] ['set-cookie' brief]]
+    :: TODO add to set-cookie ;Path=/;
 
   :: [%next 'claim-success' ~]
   [%full simple-payload]
