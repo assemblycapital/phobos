@@ -36,7 +36,7 @@
   =|  =simple-payload:http
   =.  response-header.simple-payload
     :-  303
-    ~[['Location' 'claim-success'] ['set-cookie' brief]]
+    ~[['Location' 'claim-success'] ['set-cookie' (crip (weld (trip brief) ";Path=/;"))]]
     :: TODO add to set-cookie ;Path=/;
 
   :: [%next 'claim-success' ~]
