@@ -6,7 +6,7 @@
   $:
     id=@p
     handle=(unit @t)
-    otp=(unit @t)
+    invite-code=(unit @t)
     tags=(set @t)
     session-token=(unit @t)
     time-created=@da
@@ -24,6 +24,6 @@
     [%tag-guest id=@p tags=(set @t)]
     [%untag-guest id=@p tag=@t]
     [%delete-guest id=@p]
-    [%claim-guest otp=@t]
+    [%claim-guest invite-code=@t]
   ==
 --

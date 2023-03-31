@@ -14,12 +14,12 @@
     ?~(body ~ (frisk:rudder q.u.body))
   ?~  head=(~(get by args) 'head')
     ~
-  ?~  otp=(~(get by args) 'otp')
-    'missing otp arg'
+  ?~  invite-code=(~(get by args) 'invite-code')
+    'missing invite-code arg'
   :: ~&  >  ['argue got args' args]
   ?+  u.head  'invalid action head'
       %claim-guest
-    [%claim-guest u.otp]
+    [%claim-guest u.invite-code]
   ==
 ::
 :: ++  final  (alert:rudder url.request build)
@@ -54,7 +54,7 @@
   =/  args=(map @t @t)
         (~(gas by *(map @t @t)) args)
   ::
-  =+  code=(~(get by args) 'code')
+  =+  invite-code=(~(get by args) 'invite-code')
   |^  [%page page]
   ::
   ++  style
@@ -67,7 +67,7 @@
     '''
     /*
       >what is this doing?
-      we want a clickable link to claim the OTP.
+      we want a clickable link to claim the invite-code.
       a 'GET' request is not supposed to alter app state.
       instead, we return a webpage that autosubmits a form...
       is this an antipattern? or is this the proper way to accomplish these ends?
@@ -87,12 +87,12 @@
       const currentUrl = new URL(window.location.href);
       const urlParams = new URLSearchParams(currentUrl.search);
 
-      const code = urlParams.get('code');
-      if(!code) {
-        console.log('no code')
+      const inviteCode = urlParams.get('invite-code');
+      if(!inviteCode) {
+        console.log('no inviteCode')
         return;
       }
-      console.log('code', code)
+      console.log('invite-code', inviteCode)
       submitClaimForm();
     }
     
@@ -128,7 +128,7 @@
     ^-  manx
     ;form(method "post", id "claimForm")
       ;input(type "hidden", name "head", value "claim-guest");
-      ;input(type "text", name "otp", value ?~(code "" (trip u.code)));
+      ;input(type "text", name "invite-code", value ?~(invite-code "" (trip u.invite-code)));
       ;input(type "submit", value "claim");
     ==
   --

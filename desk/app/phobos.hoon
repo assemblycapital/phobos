@@ -103,8 +103,8 @@
           %+  skim  ~(val by guests)
           |=  =guest:store
           ^-  ?
-          ?~  otp.guest  |
-          ?&  =(otp.act u.otp.guest)
+          ?~  invite-code.guest  |
+          ?&  =(invite-code.act u.invite-code.guest)
               =(~ time-claimed.guest)
           ==
         ::
@@ -115,7 +115,7 @@
         :: just take the first match
         =/  gus=guest:store  i.matches
         =.  time-claimed.gus  [~ now.bowl]
-        =.  otp.gus  ~
+        =.  invite-code.gus  ~
         =/  rng  ~(. og eny.bowl)
         :: =^  sess-raw=@q  rng
         ::   (rads:rng (pow 2 64))
@@ -280,30 +280,30 @@
       =/  args=(map @t @t)
         (~(gas by *(map @t @t)) args)
       
-      ?.  (~(has by args) 'otp')
-        :: ~&  'phobos: no otp in claim'
+      ?.  (~(has by args) 'invite-code')
+        :: ~&  'phobos: no invite-code in claim'
         :_  state
         (send [403 ~ [%plain "403 - Forbidden"]])
-      =/  otp=term
-        (~(got by args) 'otp')
-      :: ~&  "phobos: got otp {<otp>}"
+      =/  invite-code=term
+        (~(got by args) 'invite-code')
+      :: ~&  "phobos: got invite-code {<invite-code>}"
       =/  matches=(list guest:store)
         %+  skim  ~(val by guests)
         |=  =guest:store
         ^-  ?
-        ?~  otp.guest  |
-        ?&  =(otp u.otp.guest)
+        ?~  invite-code.guest  |
+        ?&  =(invite-code u.invite-code.guest)
             =(~ time-claimed.guest)
         ==
       ::
       ?~  matches
-        :: ~&  'phobos: bad otp'
+        :: ~&  'phobos: bad invite-code'
         :_  state
         (send [403 ~ [%plain "403 - Forbidden"]])
       :: ~&  ['phobos got matches' matches]
       =/  gus=guest:store  i.matches
       =.  time-claimed.gus  [~ now.bowl]
-      =.  otp.gus  ~
+      =.  invite-code.gus  ~
       =.  guests
         (~(put by guests) id.gus gus)
       :_  state
@@ -360,15 +360,15 @@
   =|  =guest:store
   =.  id.guest
     new-guest-id
-  =^  otp-raw=@q  rng
+  =^  invite-code-raw=@q  rng
     (rads:rng (pow 2 64))
-  =.  otp.guest
+  =.  invite-code.guest
     :-  ~
     %-  crip
     %+  slag  1
     %-  trip
     %+  scot  %p
-    otp-raw
+    invite-code-raw
   =.  time-created.guest
     now.bowl
   =.  time-altered.guest

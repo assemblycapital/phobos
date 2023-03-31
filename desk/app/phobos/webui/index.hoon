@@ -133,7 +133,7 @@
           ;td: id
           ;td: tags
           ;td: handle
-          ;td: otp
+          ;td: invite-code
           ;td: session-token
           ;td: time-created
           ;td: time-altered
@@ -170,12 +170,12 @@
             ;+  (render-tags id.guest tags.guest)
           ==
           ;td: {<handle.guest>}
-          ;td  :: otp
+          ;td  :: invite-code
             ;+
-            ?~  otp.guest
+            ?~  invite-code.guest
               ;span: {"~"}
             ;span
-              ;a(href "/apps/phobos/claim?code={(trip u.otp.guest)}")
+              ;a(href "/apps/phobos/claim?invite-code={(trip u.invite-code.guest)}")
                 link
               ==
             ==
