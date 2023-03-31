@@ -36,6 +36,9 @@
           ;h1: phobos claim
           ;p: successfully authenticated!
           ;p: welcome {<u.who>}
+            ;a(href "/apps/disinfo")
+              try disinfo
+            ==
         ==
       ==
     ==
