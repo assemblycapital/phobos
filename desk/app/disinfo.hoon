@@ -63,10 +63,16 @@
     ?-  -.act
         %post-rumor
       ?>  =(src.bowl our.bowl)
-      ~&  >  ['in post-rumor' act]
+      =.  t.act
+        %-  crip
+        :: max 999 chars
+        (scag 999 (trip t.act))
       =.  rumors
         :_  rumors
         [t.act now.bowl]
+      =.  rumors
+      :: max 99 rumors
+        (scag 99 rumors)
       `this
     ==
   ==
