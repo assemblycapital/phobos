@@ -325,7 +325,7 @@
     ?:  =(%king (clan:title our.bowl))
       "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
     ?:  =(%duke (clan:title our.bowl))
-      "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
+      "~botnet-{inner-id-no-sig}-{our-no-sig}"
     ~|  'only planets and higher can create phobos guests'
     !!
   :: slaw
