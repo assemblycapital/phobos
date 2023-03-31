@@ -19,7 +19,7 @@
   ?~  head=(~(get by args) 'head')
     ~
   
-  ~&  >  ['got args' args]
+  :: ~&  >  ['got args' args]
   |^  ?+  u.head  'invalid action head'
           %create-guest
         [%create-guest get-tags]
@@ -151,6 +151,7 @@
           ;td
             =style  "white-space:nowrap;"
             ;form(method "post")
+              =style  "margin-right:2px;"
               ;input(type "hidden", name "head", value "delete-guest");
               ;input(type "hidden", name "who", value "{(scow %p id.guest)}");
               ;input(type "submit", value "-");
@@ -169,7 +170,16 @@
             ;+  (render-tags id.guest tags.guest)
           ==
           ;td: {<handle.guest>}
-          ;td: {<otp.guest>}
+          ;td  :: otp
+            ;+
+            ?~  otp.guest
+              ;span: {"~"}
+            ;span
+              ;a(href "/apps/phobos/claim?code={(trip u.otp.guest)}")
+                link
+              ==
+            ==
+          ==
           ;td: {<session-token.guest>}
           ;td: {<time-created.guest>}
           ;td: {<time-altered.guest>}

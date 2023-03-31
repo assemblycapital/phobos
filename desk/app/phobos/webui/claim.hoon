@@ -49,24 +49,12 @@
   ^-  reply:rudder
   :: ?.  authenticated
   ::   [%auth url.request]
-  :: TODO xtra for setcookie and optional redir
-  ::
   =/  ,request-line:server
     (parse-request-line:server url.request)
   =/  args=(map @t @t)
         (~(gas by *(map @t @t)) args)
-  :: ~&  >>>  msg
-  :: =/  are=(unit (map @t @t))
-  ::     ?~  body.request  ~
-  ::     %+  bind
-  ::       (rush q.u.body.request yquy:de-purl:html)
-  ::     ~(gas by *(map @t @t))
-  :: ~&  >>  are
-  :: ~&  >>  request
   ::
-  =+  otp=(~(get by args) 'otp')
-  :: ?~  otp=(~(get by args) 'otp')
-  ::   [%code 403 'missing otp header']
+  =+  code=(~(get by args) 'code')
   |^  [%page page]
   ::
   ++  style
@@ -77,16 +65,40 @@
     '''
   ++  script
     '''
+    /*
+      >what is this doing?
+      we want a clickable link to claim the OTP.
+      a 'GET' request is not supposed to alter app state.
+      instead, we return a webpage that autosubmits a form...
+      is this an antipattern? or is this the proper way to accomplish these ends?
+      I feel like I've seen similar behavior in the wild, but it feels pretty stupid
+    */
+
     function submitClaimForm() { 
-      document.claimForm.submit()
+      const form = document.getElementById('claimForm');
+      console.log('form', form)
+      if(!form) return;
+      form.submit()
     }
     // window.onload = submitForm;
-    // >what is this doing?
-    // we want a clickable link to claim the OTP.
-    // a 'GET' request is not supposed to alter app state.
-    // instead, we return a webpage that autosubmits a form...
-    //  is this an antipattern? or is this the proper way to accomplish these ends?
-    //  I feel like I've seen similar behavior in the wild, but it feels pretty stupid
+
+    function main() {
+
+      const currentUrl = new URL(window.location.href);
+      const urlParams = new URLSearchParams(currentUrl.search);
+
+      const code = urlParams.get('code');
+      if(!code) {
+        console.log('no code')
+        return;
+      }
+      console.log('code', code)
+      submitClaimForm();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      main();
+    });
     '''
   ++  page
     ^-  manx
@@ -102,21 +114,22 @@
       ;body
         ;div
           ;h1: phobos claim
-          ;+  ?~  msg  ;p:""
-            ?:  o.u.msg
-              :: authenticated
-              :: TODO, who am I auth as?? o_o
+          ;+  ?~  msg
+                claim-form
+            ?.  o.u.msg
+              :: auth failed
               ;p:"{(trip t.u.msg)}"
-            :: auth failed
-            ;p:"{(trip t.u.msg)}"
-
-          ;form(method "post", name "claimForm")
-            ;input(type "hidden", name "head", value "claim-guest");
-            ;input(type "text", name "otp", value ?~(otp "" (trip u.otp)));
-            ;input(type "submit", value "claim");
-          ==
+            ::
+            claim-form
         ==
       ==
+    ==
+  ++  claim-form
+    ^-  manx
+    ;form(method "post", id "claimForm")
+      ;input(type "hidden", name "head", value "claim-guest");
+      ;input(type "text", name "otp", value ?~(code "" (trip u.code)));
+      ;input(type "submit", value "claim");
     ==
   --
 --

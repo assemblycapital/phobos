@@ -29,6 +29,42 @@
     hc    ~(. +> bowl)
     io    ~(. agentio bowl)
 ::
+++  on-peek
+  |=  =path
+  ^-  (unit (unit cage))
+  ?+    path  (on-peek:def path)
+      [%x %get-session @ ~]
+    :: expects full session-token as cord
+    =;  return  ``noun+!>(return)
+    ^-  (unit ship)
+    =/  token=@t  i.t.t.path
+    :: split by =
+    ::    find =
+    ?~  tis=(find "=" (trip token))
+      :: no = in token
+      ~
+    :: split
+    =/  trimmed  (trim u.tis (trip token))
+    :: remove 'phobos-'
+    =.  p.trimmed  (slag 7 p.trimmed)
+    :: remove '='
+    =.  q.trimmed  (slag 1 q.trimmed)
+    :: cord to aura
+    ?~  ship=(slaw %p (crip p.trimmed))
+      ~
+    ::
+    :: get ship
+    ?~  got=(~(get by guests) u.ship)
+      :: not in guests
+      ~
+    :: final token check
+    ?~  session-token.u.got
+      ~
+    ?.  =(u.session-token.u.got token)
+      ~
+    [~ id.u.got]
+  ==
+::
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
@@ -86,8 +122,9 @@
         =/  session-token-val=@ux
             (~(rad og eny.bowl) (pow 2 128))
         =/  session-token=@t
-            %-  crip
-            "phobos-{<id.gus>}={<session-token-val>}"
+            (make-full-session-token id.gus session-token-val)
+            :: %-  crip
+            :: "phobos-{<id.gus>}={<session-token-val>}"
         =.  session-token.gus
             [~ session-token]
         =.  guests
@@ -149,7 +186,6 @@
   ==
 ++  on-leave  on-leave:def
 ++  on-agent  on-agent:def
-++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 ++  on-load   on-load:def
   :: |=  old-state=vase
@@ -186,6 +222,11 @@
 :::
 ++  fof
   [404 ~ [%plain "404 - Not Found"]]
+::
+++  make-full-session-token
+  |=  [=@p =@ux]
+  %-  crip
+  "phobos-{<p>}={<ux>}"
 ++  handle-http
   |=  [eyre-id=@ta =inbound-request:eyre]
   ^-  (quip card _state)
