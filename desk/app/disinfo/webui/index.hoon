@@ -10,19 +10,18 @@
   ++  argue
   |=  [headers=header-list:http body=(unit octs)]
   ^-  $@(brief:rudder action:store)
+  
   =/  args=(map @t @t)
     ?~(body ~ (frisk:rudder q.u.body))
   ?~  head=(~(get by args) 'head')
     ~
   ?~  t=(~(get by args) 't')
     ~
+  ?:  authenticated
+    [%post-rumor u.t]
   ?~  who=(scry-validate-guest:phobos bowl request)
     'bad auth'
-  :: ~&  >  ['argue got args' args]
-  ?+  u.head  'invalid action head'
-      %post-rumor
-    [%post-rumor u.t]
-  ==
+  [%post-rumor u.t]
 ::
 ++  final  (alert:rudder url.request build)
 ::
@@ -31,16 +30,15 @@
           msg=(unit [o=? =@t])
       ==
   ^-  reply:rudder
-  :: ?.  authenticated
-  ::   [%auth url.request]
-  :: =/  ,request-line:server
-  ::   (parse-request-line:server url.request)
-  :: =/  args=(map @t @t)
-  ::       (~(gas by *(map @t @t)) args)
+  |^
+  ?:  authenticated
+    [%page page]
   ?~  who=(scry-validate-guest:phobos bowl request)
-    [%code 403 ~]
-  ~&   >>   who
-  |^  [%page page]
+    :: todo create option for admin to view
+    [%code 403 'contact admin for an invite']
+  :: ~&   >>   who
+  [%page page]
+  ::
   ::
   ++  style
     '''
@@ -75,10 +73,11 @@
           ;form(method "post")
             =style  ""
             ;input(type "hidden", name "head", value "post-rumor");
-            ;input(type "text", name "t", placeholder "youre fat", autocomplete "off");
+            ;input(type "text", name "t", placeholder "anon message", autocomplete "off");
             ;input(type "submit", value "submit");
           ==
           ;div
+            =style  "padding-bottom:4rem"
             ;p:test
             ;*
               %+  turn  rumors
@@ -86,6 +85,18 @@
                 ;p: {(trip t.rumor)}
           ==
         ==
+        ;footer
+            :: footer
+            =style  "bottom:0;position:fixed;width:100%;background-color:white;"
+            :: assembly capital logo
+            ;svg(width "32", height "32", viewbox "0 0 388 194", fill "none", xmlns "http://www.w3.org/2000/svg")
+              ;path(d "M194 0H97V97H0V194H97V97H194H291V194H388V97H291V0H194Z", fill "black");
+            ==
+            ;p
+              =style  "margin:4px 0px;"
+              ; {<our.bowl>}
+            ==
+          ==
       ==
     ==
   --
