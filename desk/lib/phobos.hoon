@@ -2,28 +2,32 @@
 =<  [sur .]
 =,  sur
 |%
+:: this should probably be renamed, as should the actual scry endpoint
 ::
 ++  peek-get-session
   |=  [=bowl:gall token=@t]
   .^((unit @p) %gx /(scot %p our.bowl)/phobos/(scot %da now.bowl)/get-session/[token]/noun)
+::
+::
+:: should this be renamed?
+:: should this return `our.bowl` if authenticated.request?
+:: then it could be used more generically for auth.
 ++  scry-validate-guest
   |=  [=bowl:gall =request:http]
   ^-  (unit ship)
-  :: assumes we dont have access to full guests, most apps wont
   ?~  cookie-header=(get-header:http 'cookie' header-list.request)
     ~
-  :: ~&  >>  u.cookie-header
   ::  is the cookie line is valid?
-  ::   
-  ?~  cookies=(rush u.cookie-header cock:de-purl:html)
+  ?~  all-cookies=(rush u.cookie-header cock:de-purl:html)
     ~
-  :: ~&  u.cookies
-  ?~  got=(get-phobos-cookies u.cookies)
-    :: ~&  >>  "missing phobos cookie"
+  ?~  got=(get-phobos-cookies u.all-cookies)
     ~
+  :: TODO rename from phobos to phobos-cookies or something
+  :: This is only a list because browsers might have multiple, and
+  :: its good to check all of them. This is common in dev environment or admin experimentation.
+  :: Its probably less common for actual users, but would still be good to have.
   =/  phobos=(list [key=@t val=@t])  got
-  :: ~&  >  :-  'got phobos cookies'  phobos
-  :: foreach phobos cookie, check if guests
+  :: foreach phobos cookie, check if its valud for guests
   |-  ?~  phobos  ~
   :: get the patp out
   =/  trim  (crip (slag 7 (trip key.i.phobos)))
@@ -49,6 +53,7 @@
   %-  crip
   "{(trip key.cookie)}={(trip val.cookie)}"
 ::
+:: this is just some boilerplate for a more fleshed out json interface in the future
 ++  enjs
   =,  enjs:format
   |%

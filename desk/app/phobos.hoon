@@ -38,6 +38,8 @@
     =;  return  ``noun+!>(return)
     ^-  (unit ship)
     =/  token=@t  i.t.t.path
+    :: TODO it might be better to use the stdlib parsing tools for this.
+    ::
     :: split by =
     ::    find =
     ?~  tis=(find "=" (trip token))
@@ -93,10 +95,9 @@
           (on-poke %phobos-action !>(act))
         [~ caz +.state]
           %claim-guest
-        :: special case for claim-guest, in order to get return msg
+        :: special case for http claim-guest, in order to get custom return msg
         :: TODO this should be improved,
-        :: probably make explicit in /sur/phobos
-        :: [~ ~ +.state]
+        :: probably make this an explicitly different poke in /sur/phobos
         ?>  =(src.bowl our.bowl)
         ::
         =/  matches=(list guest:store)
@@ -109,26 +110,27 @@
           ==
         ::
         ?~  matches
-          :: ['authentication failed' ~ guests]
-          'authenticationFailed'
-        :: ~&  ['phobos got matche' matches]
+          'authentication failed'
         :: just take the first match
         =/  gus=guest:store  i.matches
+        :: update guest info
         =.  time-claimed.gus  [~ now.bowl]
         =.  invite-code.gus  ~
         =/  rng  ~(. og eny.bowl)
-        :: =^  sess-raw=@q  rng
-        ::   (rads:rng (pow 2 64))
         =/  session-token-val=@ux
             (~(rad og eny.bowl) (pow 2 128))
         =/  session-token=@t
             (make-full-session-token id.gus session-token-val)
-            :: %-  crip
-            :: "phobos-{<id.gus>}={<session-token-val>}"
         =.  session-token.gus
             [~ session-token]
+        :: place back in guests
         =.  guests
           (~(put by guests) id.gus gus)
+        :: return with session-token as brief
+        :: this is because we have a custom handler in +final for the /claim page
+        :: which needs to return a set-cookie header including this specific session token.
+        ::   +final has access to all session tokens, but it doesnt know which one corresponds with the request
+        ::   there is almost certainly a better way to do this.
         [session-token ~ guests]
       ==
     ==
@@ -148,20 +150,19 @@
         id.guest
         guest
       `this
+      ::
         %delete-guest
       ?>  =(src.bowl our.bowl)
       =.  guests
         (~(del by guests) id.act)
       `this
+      ::
         %tag-guest
       ?>  =(src.bowl our.bowl)
       =/  ugu=(unit guest:store)
         (~(get by guests) id.act)
       ?~  ugu
         ~|  'phobos: bad guest id'  !!
-      :: ?:  (~(has in tags.u.ugu) tags.act)
-      ::   ~&  'phobos: already tagged'
-      ::   `this
       =.  tags.u.ugu
         (~(uni in tags.u.ugu) tags.act)
       =.  time-altered.u.ugu
@@ -169,6 +170,7 @@
       =.  guests
         (~(put by guests) id.act u.ugu)
       `this
+      ::
         %untag-guest
       ?>  =(src.bowl our.bowl)
       =/  ugu=(unit guest:store)
@@ -227,89 +229,6 @@
   |=  [=@p =@ux]
   %-  crip
   "phobos-{<p>}={<ux>}"
-++  handle-http
-  |=  [eyre-id=@ta =inbound-request:eyre]
-  ^-  (quip card _state)
-  :: TODO this is no longer used.
-  :: it may be worth binding this to another endpoint,
-  :: so that non-browser apps can authenticate
-  =/  ,request-line:server
-    (parse-request-line:server url.request.inbound-request)
-  =+  send=(cury response:schooner eyre-id)
-  ?.  authenticated.inbound-request
-    :_  state
-    %-  send
-    [302 ~ [%login-redirect './apps/phobos']]
-  ::           
-  ?+    method.request.inbound-request 
-    [(send [405 ~ [%stock ~]]) state]
-    ::
-      %'POST'
-    ?~  body.request.inbound-request
-      [(send fof) state]
-    =/  are=(unit (map @t @t))
-        %+  bind
-          (rush q.u.body.request.inbound-request yquy:de-purl:html)
-        ~(gas by *(map @t @t))
-    ?~  are
-      [(send fof) state]
-    =/  arm  u.are 
-    ::
-    ?+  site  [(send fof) state]
-      [%apps %phobos ~]
-    :: ~&  ['phobos got body stuff' arm]
-    :_  state
-      (send [200 ~ [%plain "200 - Success"]])
-    ==
-    ::
-      %'GET'
-    ?+    site  
-      :_  state 
-      (send [404 ~ [%plain "404 - Not Found"]])
-      ::
-        [%apps %phobos ~]
-      :_  state
-      :: =/  ht
-      ::   %-  crip
-      ::   %-  en-xml:html
-      ::   (page:webui:phobos bowl guests)
-      (send [200 ~ [%html 'todo replaceme']])
-        [%apps %phobos %claim ~]
-      :: ~&  request.inbound-request
-      :: ~&  args
-      =/  args=(map @t @t)
-        (~(gas by *(map @t @t)) args)
-      
-      ?.  (~(has by args) 'invite-code')
-        :: ~&  'phobos: no invite-code in claim'
-        :_  state
-        (send [403 ~ [%plain "403 - Forbidden"]])
-      =/  invite-code=term
-        (~(got by args) 'invite-code')
-      :: ~&  "phobos: got invite-code {<invite-code>}"
-      =/  matches=(list guest:store)
-        %+  skim  ~(val by guests)
-        |=  =guest:store
-        ^-  ?
-        ?~  invite-code.guest  |
-        ?&  =(invite-code u.invite-code.guest)
-            =(~ time-claimed.guest)
-        ==
-      ::
-      ?~  matches
-        :: ~&  'phobos: bad invite-code'
-        :_  state
-        (send [403 ~ [%plain "403 - Forbidden"]])
-      :: ~&  ['phobos got matches' matches]
-      =/  gus=guest:store  i.matches
-      =.  time-claimed.gus  [~ now.bowl]
-      =.  invite-code.gus  ~
-      =.  guests
-        (~(put by guests) id.gus gus)
-      :_  state
-      (send [200 ~ [%html 'test']])
-    ==
-  ==
 ++  create-random-botnet-moon
   |=  rng=_~(. og eny.bowl)
   ^-  [ship _rng]
@@ -326,6 +245,7 @@
       "~botnet-{inner-id-no-sig}-dozzod-{our-no-sig}"
     ?:  =(%duke (clan:title our.bowl))
       "~botnet-{inner-id-no-sig}-{our-no-sig}"
+    :: TODO should probably create an option for moons to "mint" comets
     ~|  'only planets and higher can create phobos guests'
     !!
   :: slaw
