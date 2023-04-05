@@ -2,7 +2,7 @@
 ::
 ::
 /-  store=phobos
-/+  rudder, server
+/+  rudder, server, phobos
 ::
 ^-  (page:rudder guests:store action:store)
 ::
@@ -31,15 +31,14 @@
   :: success
   :: setcookie and 303 to ./claim-success
   :: I think the brief needs to be the session token for this to work in rudder... lol
+  :: ::
+  :: :: instead of having the cookie in brief, I could probably check guests for the most recently generated cookie
   ?~  brief
     [%code 404 ~]
   =|  =simple-payload:http
   =.  response-header.simple-payload
     :-  303
     ~[['Location' 'claim-success'] ['set-cookie' (crip (weld (trip brief) ";Path=/;"))]]
-    :: TODO add to set-cookie ;Path=/;
-
-  :: [%next 'claim-success' ~]
   [%full simple-payload]
 ::
 ++  build
@@ -52,11 +51,18 @@
   =/  ,request-line:server
     (parse-request-line:server url.request)
   =/  args=(map @t @t)
-        (~(gas by *(map @t @t)) args)
+      (~(gas by *(map @t @t)) args)
   ::
   =+  invite-code=(~(get by args) 'invite-code')
-  |^  [%page page]
-  ::
+  =/  who=(unit ship)  (scry-validate-guest:phobos bowl request)
+  |^
+    ?~  who
+      :: unknown user
+      :: proceed to claim page
+      [%page page]
+    :: user has a cookie, redirect
+    [%next 'claim-success' ~]
+  :: :: ::
   ++  style
     '''
     .temp {
