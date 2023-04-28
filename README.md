@@ -4,7 +4,7 @@ An Urbit guest authentication prototype
 
 ## High Level Description
 
-Urbit can be used as an HTTP server for the public web. Some urbit apps have supported public read-access. None (to my knowledge) have supported public write-access. This is because the public internet is rampant with bots and exploiters. Phobos enables Urbit, as an HTTP server, to distinguish between public HTTP requesters and trusted users who have been invited by the admin.
+Phobos enables Urbit, as an HTTP server, to distinguish between public HTTP requesters and trusted users who have been invited by the admin.
 
 ## Implementation Details
 
